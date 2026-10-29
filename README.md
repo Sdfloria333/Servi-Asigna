@@ -25,14 +25,14 @@ Si tu Oracle usa otros datos, cámbialos con variables de entorno (o en `applica
 | Variable | Valor por defecto |
 |---|---|
 | `DB_URL` | `jdbc:oracle:thin:@localhost:1521/XEPDB1` |
-| `DB_USUARIO` | `DESPACHO` |
-| `DB_CLAVE` | `Despacho2026` |
-| `JWT_SECRETO` | uno de desarrollo (cámbialo en producción, mínimo 32 caracteres) |
+| `DB_USER` | `DESPACHO` |
+| `DB_PASSWORD` | `Despacho2026` |
+| `JWT_SECRET` | uno de desarrollo (cámbialo en producción, mínimo 32 caracteres) |
 
 Empezar de cero: `DROP USER DESPACHO CASCADE;` como SYSTEM y vuelve a ejecutar `00_crear_usuario.sql`.
 
 ## 2. Ejecutar
-En VS Code abre la carpeta `despacho` y ejecuta `DespachoApplication`, o en la terminal:
+En VS Code abre la carpeta del proyecto y ejecuta `ServiAsignaApplication`, o en la terminal:
 
     mvn spring-boot:run
 
@@ -46,7 +46,7 @@ Abre http://localhost:8080. La primera vez cada persona acepta la política de t
 | Solicitud pendiente (para probar la aprobación) | `luis` | `domi1234` |
 
 Para ver varias personas a la vez usa una ventana normal y otras de incógnito (cada una con su sesión).
-Los datos de prueba se crean solo si `despacho.datos-demo=true`.
+Los datos de prueba se crean solo si `serviasigna.demo-data=true`.
 
 **Celular**: el GPS y el micrófono exigen https: `mvn spring-boot:run -Dspring-boot.run.profiles=https` y abre `https://IP-DE-TU-PC:8443`.
 La app del domiciliario usa siempre el GPS real. Para recoger o entregar debe estar a menos de `llegada-metros` (80 m) del punto;
@@ -77,25 +77,30 @@ Ejecútalo una sola vez y vuelve a arrancar el programa.
 - **Domiciliarios** (central): estado, vehículo y carga, ruta, turno y recaudo, mensajes; novedades con su decisión.
 - **Resumen**: alertas, indicadores I1–I7 frente a la línea base, flujo, desempeño y CSV.
 - **Cuentas** (admin): aprobar domiciliarios, estados de cuenta, claves temporales, vehículos (placa), parámetros, tarifa y auditoría.
-- **App del domiciliario** (`/domi`, instalable como PWA): disponible / pausa / fuera de servicio, oferta con temporizador,
+- **App del domiciliario** (`/courier`, instalable como PWA): disponible / pausa / fuera de servicio, oferta con temporizador,
   recoger y entregar con PIN, foto, firma y valor cobrado, novedades, mensajes, turno, GPS, radio de voz y
   cola sin conexión (lo que confirma sin señal se envía al volver).
-- **Tiempo real**: STOMP en `/ws/stomp` (`/topic/central`, `/user/queue/avisos`) y radio de voz en `/ws/radio`.
+- **Tiempo real**: STOMP en `/ws/stomp` (`/topic/central`, `/user/queue/notices`) y radio de voz en `/ws/radio`.
 - **Seguridad**: token JWT con expiración en cookie HttpOnly (o `Authorization: Bearer` pidiéndolo en `POST /api/auth/token`),
-  roles ADMIN / DESPACHADOR / DOMICILIARIO, sesión única por domiciliario, cambio obligatorio de clave temporal, CSRF.
+  roles ADMIN / DISPATCHER / COURIER (en Oracle: ADMIN / DESPACHADOR / DOMICILIARIO), sesión única por domiciliario, cambio obligatorio de clave temporal, CSRF.
 
 ## 4. Mapa del código
-    src/main/java/co/despacho/
-    ├── dominio/       Entidades JPA (tablas) y máquina de estados del servicio
-    ├── persistencia/  Repositorios Spring Data
-    ├── motor/ reglas/ Motor de asignación y sus reglas (agrega reglas con @Component)
-    ├── servicio/      DespachoService (operación en memoria + guardado en Oracle), parámetros, consultas
-    ├── usuarios/ catalogo/ reportes/   Cuentas, clientes/vehículos/tarifas e indicadores
-    ├── seguridad/     JWT, filtros, permisos (SeguridadConfig)
-    ├── tiemporeal/ radio/   STOMP y radio de voz
-    ├── api/           REST (JSON): CentralApi, AdminApi, DomiApi, AuthApi
+El código (clases, métodos, variables, rutas y JSON) está en inglés; los textos que ve el usuario siguen en español.
+La base de datos conserva sus nombres en español (tablas, columnas y códigos como `EN_COLA`): cada enumeración sabe
+su código (`DbCoded`) y `DbCodeConverters` lo traduce al leer y al guardar.
+
+    src/main/java/co/serviasigna/
+    ├── ServiAsignaApplication.java   Clase principal (tareas programadas activas)
+    ├── domain/        Entidades JPA (tablas), enumeraciones con su código de Oracle y máquina de estados del servicio
+    ├── persistence/   Repositorios Spring Data
+    ├── engine/ rules/ Motor de asignación y sus reglas (agrega reglas con @Component)
+    ├── service/       DispatchService (operación en memoria + guardado en Oracle), Settings (parámetros), QueryService
+    ├── users/ catalog/ reports/   Cuentas, clientes/vehículos/tarifas e indicadores
+    ├── security/      JWT, filtros, permisos (SecurityConfig)
+    ├── realtime/ radio/   STOMP y radio de voz
+    ├── api/           REST (JSON): CentralApi, AdminApi, CourierApi, AuthApi
     ├── web/           Páginas
-    └── config/        MigradorEsquema (scripts SQL versionados) y el motor
+    └── config/        SchemaMigrator (scripts SQL versionados) y la configuración del motor
     src/main/resources/db/          Scripts de Oracle (migracion/ se aplica sola; oracle/ es para SQL Developer o sqlplus)
     src/main/resources/templates/   Páginas Thymeleaf
     src/main/resources/static/      JavaScript, estilos, Leaflet y la PWA del domiciliario
