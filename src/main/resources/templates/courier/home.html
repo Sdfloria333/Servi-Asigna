@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Mi turno')}"></head>
+<body>
+<div class="mobile">
+  <div class="mobile-bar">
+    <div class="greeting"><small>Hola,</small><b th:text="${currentUser?.name}">Domiciliario</b></div>
+    <span id="liveChip" class="chip chip-gray ms-auto">…</span>
+    <span class="clock"><i class="bi bi-clock"></i><b id="clock">--:--</b></span>
+    <form th:action="@{/logout}" method="post"><button class="btn btn-sm btn-outline-secondary" type="submit" title="Salir"><i class="bi bi-box-arrow-right"></i></button></form>
+  </div>
+  <div id="courierNotices"></div>
+
+  <!-- Estado operativo (RF-M6-02) -->
+  <div class="panel mb-3">
+    <div class="d-flex align-items-center gap-2 mb-2"><b>Mi estado</b><span id="statusChip" class="ms-auto"></span></div>
+    <div class="btn-group w-100" role="group" id="statuses">
+      <button type="button" class="btn btn-outline-success" data-status="AVAILABLE">Disponible</button>
+      <button type="button" class="btn btn-outline-warning" data-status="BUSY">Pausa</button>
+      <button type="button" class="btn btn-outline-secondary" data-status="OFF_DUTY">Fuera de servicio</button>
+    </div>
+    <div class="small text-soft mt-2" id="statusText"></div>
+  </div>
+
+  <!-- Qué hacer ahora -->
+  <div class="panel hero mb-3" id="heroCard">
+    <h2 id="heroTitle">…</h2>
+    <p id="heroDetail" class="mb-2"></p>
+    <form id="confirmForm" class="d-none">
+      <div id="pinField" class="mb-2 d-none"><label class="form-label" for="inPin">PIN del cliente</label>
+        <input id="inPin" class="form-control form-control-lg text-center pin-input" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>
+      <div id="amountField" class="mb-2 d-none"><label class="form-label" for="inAmount">Dinero recibido (COP)</label>
+        <input id="inAmount" class="form-control" type="number" min="0" step="100"></div>
+      <div id="photoField" class="mb-2 d-none"><label class="form-label" for="inPhoto">Foto de la entrega</label>
+        <input id="inPhoto" class="form-control" type="file" accept="image/*" capture="environment"></div>
+      <div id="signatureField" class="mb-2 d-none"><label class="form-label">Firma del cliente</label>
+        <canvas id="signature" class="signature" width="320" height="120"></canvas><button type="button" class="btn btn-sm btn-link" id="clearSignature">Borrar</button></div>
+      <button id="btnConfirm" class="btn btn-primary btn-lg w-100" type="submit"></button>
+    </form>
+    <div class="d-flex gap-2 mt-2">
+      <a id="btnNavigate" class="btn btn-outline-primary flex-grow-1 d-none" target="_blank" rel="noopener"><i class="bi bi-sign-turn-right"></i> Navegar</a>
+      <a id="btnCall" class="btn btn-outline-secondary d-none"><i class="bi bi-telephone"></i></a>
+      <button id="btnIncident" class="btn btn-outline-danger" type="button"><i class="bi bi-exclamation-triangle"></i> Novedad</button>
+    </div>
+  </div>
+
+  <div class="panel mb-3">
+    <div class="panel-title">Mapa <span id="gpsStatus" class="chip chip-gray"><i class="bi bi-geo-alt"></i> GPS</span></div>
+    <div id="map" class="map map-courier"></div>
+  </div>
+
+  <div class="panel mb-3"><div class="panel-title">Mi ruta</div><ol class="route-mini" id="route"></ol></div>
+  <div class="panel mb-3"><div class="panel-title">Mi turno</div><div class="shift-mini" id="shift"></div></div>
+  <div class="panel mb-3">
+    <div class="panel-title">Mensajes con la central</div>
+    <div class="chat" id="chat"></div>
+    <div class="templates" id="templates"></div>
+    <form class="d-flex gap-2 mt-2" id="messageForm"><input class="form-control" maxlength="300" placeholder="Escribe a la central"><button class="btn btn-primary">Enviar</button></form>
+  </div>
+  <div class="panel mb-3"><div id="radio"></div></div>
+</div>
+
+<!-- Oferta con temporizador (RF-M6-03) -->
+<div class="dialog-backdrop d-none" id="offer">
+  <div class="dialog dialog-offer">
+    <h2>Nuevo servicio <span id="offerSec" class="chip chip-red"></span></h2>
+    <div class="progress mb-2" style="height:6px"><div class="progress-bar" id="offerBar"></div></div>
+    <div id="offerDetail"></div>
+    <div class="dialog-buttons">
+      <button class="btn btn-outline-secondary" id="btnReject">Rechazar</button>
+      <button class="btn btn-primary btn-lg" id="btnAccept">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novedad (RF-M6-08) -->
+<div class="dialog-backdrop d-none" id="incidentDialog">
+  <form class="dialog" id="incidentForm">
+    <h2>Reportar novedad</h2>
+    <label class="form-label" for="incType">Tipo</label><select class="form-select mb-2" id="incType"></select>
+    <label class="form-label" for="incDelivery">Pedido</label><select class="form-select mb-2" id="incDelivery"></select>
+    <label class="form-label" for="incText">Qué pasó</label><textarea class="form-control mb-2" id="incText" rows="3" maxlength="500" required></textarea>
+    <label class="form-label" for="incPhoto">Foto (opcional)</label><input class="form-control mb-2" id="incPhoto" type="file" accept="image/*" capture="environment">
+    <div class="dialog-buttons"><button type="button" class="btn btn-outline-secondary" id="incCancel">Cancelar</button><button class="btn btn-danger">Enviar</button></div>
+  </form>
+</div>
+<script type="module" th:src="@{/js/pages/courier.js}"></script>
+</body>
+</html>
