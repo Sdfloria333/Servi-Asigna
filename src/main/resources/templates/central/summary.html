@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Resumen')}"></head>
+<body>
+<div class="app">
+  <nav th:replace="~{fragments :: centralMenu('summary')}"></nav>
+  <main class="content">
+    <header th:replace="~{fragments :: topBar('Resumen e indicadores')}"></header>
+    <div class="panel mb-3"><div class="panel-title">Alertas ahora</div><ul class="list" id="alerts"></ul></div>
+    <div class="panel mb-3">
+      <div class="panel-title">Indicadores
+        <form class="d-flex gap-2 align-items-center" id="rangeForm">
+          <input type="date" class="form-control form-control-sm" id="from"> a <input type="date" class="form-control form-control-sm" id="to">
+          <button class="btn btn-sm btn-primary">Ver</button>
+          <a class="btn btn-sm btn-outline-secondary" id="csvDeliveries"><i class="bi bi-download"></i> Servicios CSV</a>
+          <a class="btn btn-sm btn-outline-secondary" id="csvIndicators"><i class="bi bi-download"></i> Indicadores CSV</a>
+        </form>
+      </div>
+      <div class="big-figures" id="figures"></div>
+      <div class="table-scroll"><table class="table" id="indicatorsTable"></table></div>
+      <h3 class="h6 mt-3">Flujo de servicios</h3>
+      <div id="flow" class="flow"></div>
+      <h3 class="h6 mt-3">Desempeño por domiciliario</h3>
+      <div class="table-scroll"><table class="table table-sm" id="performanceTable"></table></div>
+    </div>
+  </main>
+</div>
+<script type="module" th:src="@{/js/pages/summary.js}"></script>
+</body>
+</html>
