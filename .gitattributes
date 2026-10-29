@@ -1,0 +1,6 @@
+# Texto con fin de línea normalizado; los binarios no se tocan
+* text=auto
+*.p12  binary
+*.png  binary
+*.jpg  binary
+*.docx binary
