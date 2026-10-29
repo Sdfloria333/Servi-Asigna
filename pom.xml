@@ -8,10 +8,10 @@
     <version>3.3.5</version>
     <relativePath/>
   </parent>
-  <groupId>co.despacho</groupId>
-  <artifactId>despacho</artifactId>
+  <groupId>co.serviasigna</groupId>
+  <artifactId>serviasigna</artifactId>
   <version>1.0.0</version>
-  <name>despacho</name>
+  <name>serviasigna</name>
   <description>Sistema de despacho de domicilios con asignación inteligente y seguimiento GPS (Valledupar)</description>
   <properties>
     <java.version>21</java.version>
