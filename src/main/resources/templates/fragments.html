@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<!-- Piezas que se repiten en todas las pantallas. Cada página las pide con th:replace. -->
+
+<!-- <head> común: Bootstrap y Leaflet (copias locales), tema propio y el token CSRF -->
+<head th:fragment="head(title)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+  <meta name="theme-color" content="#0071e3">
+  <link rel="manifest" th:href="@{/manifest.webmanifest}">
+  <title th:text="${title} + ' · Despacho'">Despacho</title>
+  <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
+  <link rel="stylesheet" th:href="@{/vendor/leaflet/leaflet.css}">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+  <script th:src="@{/vendor/leaflet/leaflet.js}"></script>
+</head>
+
+<!-- Menú lateral de la central. "activo" es la sección que se resalta -->
+<nav th:fragment="centralMenu(active)" class="menu">
+  <div class="menu-brand"><i class="bi bi-box-seam-fill"></i> Despacho</div>
+  <ul class="menu-list">
+    <li><a th:href="@{/central}" th:classappend="${active == 'deliveries'} ? 'active-item'"><i class="bi bi-box2"></i> Servicios</a></li>
+    <li><a th:href="@{/central/couriers}" th:classappend="${active == 'couriers'} ? 'active-item'"><i class="bi bi-bicycle"></i> Domiciliarios
+      <span id="badgeIncidents" class="badge-item d-none" title="Novedades abiertas">0</span></a></li>
+    <li><a th:href="@{/central/summary}" th:classappend="${active == 'summary'} ? 'active-item'"><i class="bi bi-bar-chart-line"></i> Resumen
+      <span id="badgeAlerts" class="badge-item d-none" title="Alertas">0</span></a></li>
+    <li th:if="${isAdmin}"><a th:href="@{/central/accounts}" th:classappend="${active == 'accounts'} ? 'active-item'"><i class="bi bi-people"></i> Cuentas
+      <span id="badgePending" class="badge-item d-none" title="Solicitudes por aprobar">0</span></a></li>
+  </ul>
+  <div id="radio"></div>
+  <div class="menu-footer">
+    <div>
+      <div class="name" th:text="${currentUser?.name}">Central</div>
+      <div class="role" th:text="${isAdmin} ? 'Administrador' : 'Despachador'">Despachador</div>
+    </div>
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="btn btn-sm btn-outline-secondary w-100"><i class="bi bi-box-arrow-right"></i> Salir</button>
+    </form>
+  </div>
+</nav>
+
+<!-- Barra de arriba: título, modo del motor, conexión en vivo y hora real -->
+<header th:fragment="topBar(title)" class="bar">
+  <h1 th:text="${title}">Título</h1>
+  <div class="status-bar">
+    <span id="liveChip" class="chip chip-gray">Conectando…</span>
+    <span id="engineBadge" class="chip">Motor</span>
+    <span class="clock"><i class="bi bi-clock"></i><b id="clock">--:--:--</b></span>
+  </div>
+</header>
+
+<!-- Pantallas sencillas de entrada (login, registro, clave, política) -->
+<div th:fragment="loginBrand" class="login-brand"><i class="bi bi-box-seam-fill"></i> Despacho <small>Valledupar</small></div>
+</html>

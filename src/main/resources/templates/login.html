@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Iniciar sesión')}"></head>
+<body>
+<div class="access">
+  <div class="access-box">
+    <div class="access-brand">
+      <i class="bi bi-box-seam-fill"></i>
+      <h1>Despacho</h1>
+      <p>Central de domicilios</p>
+    </div>
+
+    <div class="panel">
+      <!-- Mensajes: el servidor agrega ?error, ?pendiente, ?salio o ?registrado a la dirección -->
+      <div th:if="${param.error}" class="alert alert-danger py-2 small">Usuario o contraseña incorrectos.</div>
+      <div th:if="${param.pending}" class="alert alert-warning py-2 small"><i class="bi bi-hourglass-split"></i> Tu cuenta todavía no ha sido aprobada por el administrador. Intenta más tarde.</div>
+      <div th:if="${param.bloqueado}" class="alert alert-danger py-2 small">Tu cuenta está suspendida o inactiva. Habla con el administrador.</div>
+      <div th:if="${param.expirado}" class="alert alert-warning py-2 small">Tu sesión terminó (venció o entraste desde otro dispositivo). Vuelve a entrar.</div>
+      <div th:if="${param.salio}" class="alert alert-secondary py-2 small">Cerraste sesión.</div>
+      <div th:if="${param.registrado}" class="alert alert-success py-2 small">Solicitud enviada. Cuando la central te apruebe podrás entrar con tu usuario.</div>
+
+      <!-- th:action agrega solo el token CSRF que Spring exige en los formularios -->
+      <form th:action="@{/login}" method="post">
+        <div class="mb-3">
+          <label class="form-label" for="username">Usuario</label>
+          <input class="form-control" id="username" name="username" required autofocus autocomplete="username" autocapitalize="none">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="password">Contraseña</label>
+          <input class="form-control" id="password" name="password" type="password" required autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary w-100" type="submit">Entrar</button>
+      </form>
+    </div>
+    <p class="text-center mt-3 small text-soft">¿Eres domiciliario y no tienes cuenta? <a th:href="@{/register}">Regístrate</a></p>
+  </div>
+</div>
+</body>
+</html>

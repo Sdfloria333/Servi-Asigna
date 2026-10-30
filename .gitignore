@@ -1,0 +1,13 @@
+# Compilación
+target/
+*.class
+
+# Datos locales y registros
+datos/
+*.log
+
+# Editores
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.iml

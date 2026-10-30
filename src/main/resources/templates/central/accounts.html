@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Cuentas y configuración')}"></head>
+<body>
+<div class="app">
+  <nav th:replace="~{fragments :: centralMenu('accounts')}"></nav>
+  <main class="content">
+    <header th:replace="~{fragments :: topBar('Cuentas y configuración')}"></header>
+    <div class="panel mb-3"><div class="panel-title">Solicitudes por aprobar</div><div id="pending"></div></div>
+    <div class="panel mb-3">
+      <div class="panel-title">Cuentas</div>
+      <div class="table-scroll"><table class="table align-middle" id="accountsTable"></table></div>
+      <form class="row g-2 align-items-end mt-2" id="accountForm">
+        <div class="col-auto"><label class="form-label">Nombre</label><input class="form-control form-control-sm" name="name" required></div>
+        <div class="col-auto"><label class="form-label">Usuario</label><input class="form-control form-control-sm" name="username" required></div>
+        <div class="col-auto"><label class="form-label">Clave temporal</label><input class="form-control form-control-sm" name="password" required></div>
+        <div class="col-auto"><label class="form-label">Rol</label><select class="form-select form-select-sm" name="role"><option value="DISPATCHER">Despachador</option><option value="ADMIN">Administrador</option></select></div>
+        <div class="col-auto"><button class="btn btn-sm btn-primary">Crear cuenta de central</button></div>
+      </form>
+    </div>
+    <div class="row g-3">
+      <div class="col-xl-7"><div class="panel"><div class="panel-title">Parámetros de operación <small>se aplican al instante</small></div>
+        <div class="table-scroll limited-height"><table class="table table-sm align-middle" id="settingsTable"></table></div></div></div>
+      <div class="col-xl-5"><div class="panel mb-3"><div class="panel-title">Tarifa vigente</div>
+        <form class="row g-2" id="rateForm"></form></div>
+        <div class="panel"><div class="panel-title">Auditoría de hoy</div><ul class="list small limited-height" id="audit"></ul></div></div>
+    </div>
+  </main>
+</div>
+<script type="module" th:src="@{/js/pages/accounts.js}"></script>
+</body>
+</html>

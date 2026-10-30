@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Domiciliarios')}"></head>
+<body>
+<div class="app">
+  <nav th:replace="~{fragments :: centralMenu('couriers')}"></nav>
+  <main class="content">
+    <header th:replace="~{fragments :: topBar('Domiciliarios y novedades')}"></header>
+    <div class="panel mb-3">
+      <div class="panel-title">Novedades abiertas <small>reportadas por los domiciliarios</small></div>
+      <div id="incidents"></div>
+    </div>
+    <div class="courier-cards" id="couriers"></div>
+  </main>
+</div>
+<script type="module" th:src="@{/js/pages/couriers.js}"></script>
+</body>
+</html>

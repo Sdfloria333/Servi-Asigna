@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Política de datos')}"></head>
+<body>
+<div class="access">
+  <div class="access-box access-wide">
+    <div class="access-brand"><i class="bi bi-shield-check"></i><h1>Tratamiento de datos y ubicación</h1>
+      <p th:if="${policy}">Versión <span th:text="${policy.version}"></span></p></div>
+    <div class="panel">
+      <div th:if="${error}" class="alert alert-danger py-2 small" th:text="${error}"></div>
+      <div class="policy-text" th:text="${policy?.text}"></div>
+      <form th:action="@{/policy}" method="post" class="mt-3">
+        <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="accepted" name="accepted" value="true">
+          <label class="form-check-label" for="accepted">He leído y acepto la política.</label></div>
+        <button class="btn btn-primary w-100" type="submit">Continuar</button>
+      </form>
+      <form th:action="@{/logout}" method="post" class="mt-2"><button class="btn btn-link btn-sm w-100" type="submit">No acepto, salir</button></form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

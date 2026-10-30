@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sin permiso · Despacho</title>
+  <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.min.css}">
+  <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div class="access">
+  <div class="access-box text-center">
+    <div class="access-brand"><i class="bi bi-shield-lock"></i><h1>No tienes permiso</h1>
+      <p>Tu cuenta no puede abrir esta pantalla.</p></div>
+    <a class="btn btn-primary" th:href="@{/}">Volver al inicio</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Servicios')}"></head>
+<body>
+<div class="app">
+  <nav th:replace="~{fragments :: centralMenu('deliveries')}"></nav>
+  <main class="content">
+    <header th:replace="~{fragments :: topBar('Servicios')}"></header>
+
+    <!-- Modo del motor (RF-M5-01) -->
+    <div class="panel engine-strip mb-3">
+      <div class="btn-group" role="group" aria-label="Modo de asignación" id="modes">
+        <button type="button" class="btn btn-outline-secondary" data-mode="MANUAL"><i class="bi bi-hand-index"></i> Manual</button>
+        <button type="button" class="btn btn-outline-secondary" data-mode="BROADCAST"><i class="bi bi-megaphone"></i> Difusión</button>
+        <button type="button" class="btn btn-outline-secondary" data-mode="AUTOMATIC"><i class="bi bi-cpu"></i> Automático</button>
+      </div>
+      <div class="flex-grow-1 text-soft small" id="modeText"></div>
+      <div class="figures-strip" id="figures"></div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-xl-7">
+        <div class="panel">
+          <div class="panel-title">Mapa en vivo <small>clic en el mapa: marca recogida y luego entrega · arrastra R/E para corregir</small></div>
+          <div id="map" class="map"></div>
+        </div>
+      </div>
+      <div class="col-xl-5">
+        <form class="panel" id="deliveryForm" autocomplete="off">
+          <div class="panel-title">Nuevo servicio</div>
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label" for="phone">Teléfono del cliente</label>
+              <input id="phone" class="form-control" maxlength="20" inputmode="tel" placeholder="300 123 4567"></div>
+            <div class="col-6"><label class="form-label" for="customer">Cliente</label>
+              <input id="customer" class="form-control" maxlength="80"></div>
+            <div class="col-12 small text-soft" id="customerInfo"></div>
+            <div class="col-12"><label class="form-label" for="inPickup">Recoger en</label>
+              <div class="input-group"><span class="input-group-text mark-R">R</span><input id="inPickup" class="form-control" placeholder="Dirección (Enter para buscar) o clic en el mapa">
+                <button type="button" class="btn btn-outline-secondary" data-search="R" title="Buscar"><i class="bi bi-search"></i></button></div>
+              <div class="suggestions" id="sugR"></div></div>
+            <div class="col-12"><label class="form-label" for="inDropoff">Entregar en</label>
+              <div class="input-group"><span class="input-group-text mark-E">E</span><input id="inDropoff" class="form-control" placeholder="Dirección (Enter para buscar) o clic en el mapa">
+                <button type="button" class="btn btn-outline-secondary" data-search="E" title="Buscar"><i class="bi bi-search"></i></button></div>
+              <div class="suggestions" id="sugE"></div></div>
+            <div class="col-12 small text-soft" id="estimate"></div>
+            <div class="col-4"><label class="form-label" for="size">Tamaño</label>
+              <select id="size" class="form-select"><option value="SMALL">Pequeño</option><option value="MEDIUM">Mediano</option><option value="LARGE">Grande</option></select></div>
+            <div class="col-4"><label class="form-label" for="priority">Prioridad</label>
+              <select id="priority" class="form-select"><option value="NORMAL">Normal</option><option value="HIGH">Alta</option></select></div>
+            <div class="col-4"><label class="form-label" for="paymentMethod">Pago</label>
+              <select id="paymentMethod" class="form-select"><option value="PREPAID">Prepagado</option><option value="CASH">Efectivo</option><option value="TRANSFER">Transferencia</option></select></div>
+            <div class="col-4"><label class="form-label" for="value">Valor (COP)</label>
+              <input id="value" class="form-control" type="number" min="0" step="100" placeholder="auto"></div>
+            <div class="col-4"><label class="form-label" for="readyMin">Listo en (min)</label>
+              <input id="readyMin" class="form-control" type="number" value="0" min="0"></div>
+            <div class="col-4"><label class="form-label" for="deadlineMin">Entregar en máx.</label>
+              <input id="deadlineMin" class="form-control" type="number" value="40" min="5"></div>
+            <div class="col-7"><label class="form-label" for="scheduled">Programar para <span class="text-soft">(opcional)</span></label>
+              <input id="scheduled" class="form-control" type="datetime-local"></div>
+            <div class="col-5 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" id="saveCustomer" checked>
+              <label class="form-check-label small" for="saveCustomer">Guardar cliente</label></div></div>
+            <div class="col-12"><label class="form-label" for="note">Detalle del pedido</label>
+              <input id="note" class="form-control" maxlength="200" placeholder="Ej: 2 hamburguesas · Restaurante El Sabor"></div>
+            <div class="col-12 d-flex gap-2 align-items-center">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg"></i> Crear servicio</button>
+              <button class="btn btn-outline-secondary" type="button" id="btnClear">Limpiar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Servicios de hoy
+        <div class="btn-group btn-group-sm" role="group" id="filters">
+          <button type="button" class="btn btn-outline-secondary active" data-filter="open">Abiertos <span id="nOpen"></span></button>
+          <button type="button" class="btn btn-outline-secondary" data-filter="closed">Cerrados</button>
+          <button type="button" class="btn btn-outline-secondary" data-filter="all">Todos</button>
+        </div>
+      </div>
+      <div class="table-scroll"><table class="table align-middle" id="deliveriesTable"></table></div>
+    </div>
+  </main>
+</div>
+<script type="module" th:src="@{/js/pages/deliveries.js}"></script>
+</body>
+</html>
