@@ -1,9 +1,9 @@
 package co.serviasigna.service;
 
-import co.serviasigna.domain.PaymentMethod;
-import co.serviasigna.domain.Priority;
 import co.serviasigna.domain.GeoPoint;
 import co.serviasigna.domain.PackageSize;
+import co.serviasigna.domain.PaymentMethod;
+import co.serviasigna.domain.Priority;
 
 /**
  * Lo que la central escribe para crear un servicio (RF-M3-01). Lo opcional puede venir en null.

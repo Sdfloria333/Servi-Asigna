@@ -1,0 +1,5 @@
+{
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "spring-boot.ls.problem.boot-version-validation.BOOT_VERSION_VALIDATION_CODE": "IGNORE"
+}

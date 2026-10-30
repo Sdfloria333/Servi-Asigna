@@ -6,7 +6,6 @@ import co.serviasigna.service.view.*;
 import co.serviasigna.users.UserAccount;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -126,7 +125,7 @@ public class DispatchService {
             Courier d = couriers.get(e.getKey());
             if (d == null) continue;
             List<DeliveryStop> ps = e.getValue();
-            ps.sort(Comparator.comparing(p -> p.getSequence() == null ? 999 : p.getSequence()));
+            ps.sort(Comparator.comparing(p -> Objects.requireNonNullElse(p.getSequence(), 999)));
             List<Stop> route = new ArrayList<>();
             for (DeliveryStop p : ps) route.add(new Stop(deliveries.get(p.getDeliveryId()), p.getType()));
             d.setRoute(route);
@@ -154,9 +153,9 @@ public class DispatchService {
         validatePoint(d.pickup(), "recogida"); validatePoint(d.dropoff(), "entrega");
         if (d.pickup().distanceM(d.dropoff()) < 50) throw new IllegalArgumentException("La recogida y la entrega no pueden ser el mismo lugar");
 
-        double deadlineMin = d.deadlineMin() == null ? settings.number("servicio.limite-defecto-min") : d.deadlineMin();
-        double readyMin = d.readyMin() == null ? 0 : d.readyMin();
-        double maxPickupMin = d.maxPickupMin() == null ? settings.maxPickupMin() : d.maxPickupMin();
+        double deadlineMin = Objects.requireNonNullElseGet(d.deadlineMin(), () -> settings.number("servicio.limite-defecto-min"));
+        double readyMin = Objects.requireNonNullElse(d.readyMin(), 0.0);
+        double maxPickupMin = Objects.requireNonNullElseGet(d.maxPickupMin(), settings::maxPickupMin);
         if (deadlineMin < 5) throw new IllegalArgumentException("El tiempo para entregar debe ser de mínimo 5 minutos");
         if (deadlineMin > 24 * 60) throw new IllegalArgumentException("El tiempo para entregar no puede pasar de 24 horas");
         if (readyMin < 0) throw new IllegalArgumentException("El tiempo en que estará listo el pedido no puede ser negativo");
@@ -191,7 +190,7 @@ public class DispatchService {
         PackageSize size = d.size() == null ? PackageSize.SMALL : d.size();
         Priority priority = d.priority() == null ? Priority.NORMAL : d.priority();
         PaymentMethod payment = d.paymentMethod() == null ? PaymentMethod.PREPAID : d.paymentMethod();
-        long value = d.value() != null ? d.value() : suggestedValue(d.pickup(), d.dropoff(), size);
+        long value = Objects.requireNonNullElseGet(d.value(), () -> suggestedValue(d.pickup(), d.dropoff(), size));
         if (value < 0 || value > 10_000_000) throw new IllegalArgumentException("El valor del servicio no es válido");
         String pin = String.format("%04d", random.nextInt(10000));
 
@@ -225,12 +224,12 @@ public class DispatchService {
         Delivery s = opened(id);
         if (s.getPickedUp() != null || s.getStatus() == DeliveryStatus.IN_PROGRESS)
             throw new IllegalArgumentException("El servicio #" + id + " ya fue recogido: no se puede editar");
-        double readyAt = d.readyAt() == null ? s.getReadyAt() : d.readyAt();
-        double deadline = d.deadline() == null ? s.getDeadline() : d.deadline();
+        double readyAt = Objects.requireNonNullElse(d.readyAt(), s.getReadyAt());
+        double deadline = Objects.requireNonNullElse(d.deadline(), s.getDeadline());
         if (readyAt >= deadline) throw new IllegalArgumentException("El pedido debe estar listo antes del límite de entrega");
         String phone = clear(d.phone(), 20);
         if (!phone.isEmpty() && !PHONE_PATTERN.matcher(phone).matches()) throw new IllegalArgumentException("El teléfono del cliente no es válido");
-        long value = d.value() == null ? s.getValue() : d.value();
+        long value = Objects.requireNonNullElse(d.value(), s.getValue());
         if (value < 0) throw new IllegalArgumentException("El valor no puede ser negativo");
         PackageSize size = d.size() == null ? s.getSize() : d.size();
         PackageSize before = s.getSize();
@@ -507,7 +506,8 @@ public class DispatchService {
         Stop p = d.nextStop();
         if (p == null) throw new IllegalArgumentException("No tienes paradas pendientes");
         double now = clock.now();
-        double time = c.eventTime() != null && c.eventTime() <= now + 0.1 && c.eventTime() > now - 1440 ? c.eventTime() : now;
+        Double eventTime = c.eventTime();
+        double time = eventTime != null && eventTime <= now + 0.1 && eventTime > now - 1440 ? eventTime : now;
         GeoPoint pos = c.lat() != null && c.lng() != null ? new GeoPoint(c.lat(), c.lng()) : d.getPosition();
         if (!pos.isValid()) pos = d.getPosition();
         double meters = pos.distanceM(p.destination());
@@ -551,7 +551,7 @@ public class DispatchService {
                 amountCollected = c.amountReceived();
             }
             for (DeliveryProof ev : proofs) db.proofs().save(ev);
-            long payment = s.getCourierPay() == null ? 0 : s.getCourierPay();
+            long payment = Objects.requireNonNullElse(s.getCourierPay(), 0L);
             s.recordCollection(amountCollected, payment);
             Shift t = shifts.get(d.getId());
             if (t != null) { t.addDelivered(amountCollected == null ? 0 : amountCollected, payment); db.shifts().save(t); }
@@ -887,7 +887,7 @@ public class DispatchService {
     private Comparator<Delivery> urgencyOrder(double now) {
         return Comparator.comparing((Delivery s) -> -s.getPriority().ordinal())
                 .thenComparingDouble(s -> Math.min(s.getPickupDeadline(), s.getDeadline()))
-                .thenComparingDouble(s -> s.getQueuedSince() == null ? now : s.getQueuedSince());
+                .thenComparingDouble(s -> Objects.requireNonNullElse(s.getQueuedSince(), now));
     }
 
     private Distances matrixFor(List<Courier> ds, List<Delivery> extra) {
@@ -1101,7 +1101,7 @@ public class DispatchService {
             Delivery s = deliveries.get(o.getDeliveryId());
             double[] info = offerInfo.getOrDefault(o.getId(), new double[]{0, 0});
             if (s != null) offerView = new CourierOfferView(o.getId(), (int) Math.max(0, Math.round((o.getDeadline() - now) * 60)), settings.offerSeconds(),
-                    deliveryView(s, null, null, now).withoutPin(), info[0], s.getCourierPay() == null ? 0 : s.getCourierPay(), info[1]);
+                    deliveryView(s, null, null, now).withoutPin(), info[0], Objects.requireNonNullElse(s.getCourierPay(), 0L), info[1]);
         }
         List<MessageView> messages = db.messages().findTop40ByCourierIdOrderByDateDesc(courierId).stream().map(this::messageView).toList();
         List<String> templates = db.templates().findByActiveTrueOrderByIdAsc().stream()

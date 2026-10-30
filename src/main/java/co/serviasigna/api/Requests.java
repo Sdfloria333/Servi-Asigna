@@ -3,7 +3,6 @@ package co.serviasigna.api;
 import co.serviasigna.domain.*;
 import co.serviasigna.users.Role;
 import jakarta.validation.constraints.*;
-import java.time.LocalDate;
 
 /** Cuerpos JSON de la API con sus validaciones (Bean Validation). Los mensajes salen tal cual en pantalla. */
 public final class Requests {

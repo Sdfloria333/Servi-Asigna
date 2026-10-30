@@ -7,7 +7,6 @@ import co.serviasigna.persistence.RateRepository;
 import co.serviasigna.service.DispatchService;
 import co.serviasigna.service.Settings;
 import co.serviasigna.service.ScheduledDeliveryPlanner;
-import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
